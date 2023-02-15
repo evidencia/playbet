@@ -24,7 +24,7 @@ export function TableBets() {
 
           <tr>
             <td>10-02-2023</td>
-            <td>A velha</td>
+            <td>Jogo da Velha</td>
             <td className='gain'>Ganho</td>
             <td>2,00 <span>R$</span></td>
           </tr>
@@ -38,7 +38,7 @@ export function TableBets() {
 
           <tr>
             <td>10-02-2023</td>
-            <td>A velha</td>
+            <td>Jogo da Velha</td>
             <td className='gain'>Ganho</td>
             <td>2,00 <span>R$</span></td>
           </tr>

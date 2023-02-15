@@ -86,7 +86,7 @@ export const GlobalStyle = createGlobalStyle`
   .depositModal{
     width: 100%;
 
-    input{
+    input, select{
       width: 100%;
       height: 3rem;
       background: #121214;

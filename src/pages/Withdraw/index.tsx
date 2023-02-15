@@ -6,43 +6,25 @@ import { FooterBottom } from '../../components/FototerBottom';
 import { Header } from '../../components/Header';
 
 import { Container } from './styles';
-import requests from '../../services/requests';
-import formatDate from '../../utils/formatDate';
 import ITransaction from '../../interfaces/ITransaction';
+import formatDate from '../../utils/formatDate';
+import requests from '../../services/requests';
 import formatToBRL from '../../utils/formatToBRL';
 import setUserData from '../../utils/setUserData';
 
-export function Deposit() {
-  const [depositModalIsOpen, setDepositModalIsOpen] = useState(false);
+export function Withdraw() {
+  const [withdrawModalIsOpen, setWithdrawModalIsOpen] = useState(false);
   const [isFetching, setFetching] = useState(false);
   const [data, setData] = useState<ITransaction[]>([]);
   const [amount, setAmount] = useState(0);
 
   function openModal() {
-    setDepositModalIsOpen(true);
+    setWithdrawModalIsOpen(true);
   }
 
   function closeModal() {
-    setDepositModalIsOpen(false);
+    setWithdrawModalIsOpen(false);
   }
-
-  const getTransactions = async () => {
-    try {
-      setFetching(true);
-      const userData = JSON.parse(localStorage.getItem('playbet:user') || '');
-      if (!userData) throw new Error('User not found');
-
-      const transactions = await requests.get.transactions.fromUser(
-        userData.id,
-        { type: 'deposito' }
-      );
-
-      setData(transactions);
-      setFetching(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +35,7 @@ export function Deposit() {
       await requests.post.transactions.create({
         amount,
         paymentMethod: 'PIX',
-        type: 'deposito',
+        type: 'saque',
         userId: userData.id,
       });
 
@@ -62,6 +44,24 @@ export function Deposit() {
       await setUserData();
       await getTransactions();
     } catch (error) {}
+  };
+
+  const getTransactions = async () => {
+    try {
+      setFetching(true);
+      const userData = JSON.parse(localStorage.getItem('playbet:user') || '');
+
+      if (!userData) throw new Error('User not found');
+      const transactions = await requests.get.transactions.fromUser(
+        userData.id,
+        { type: 'saque' }
+      );
+
+      setData(transactions);
+      setFetching(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export function Deposit() {
         <div>
           <button onClick={openModal}>
             <Plus size={16} />
-            Novo deposito
+            Novo saque
           </button>
         </div>
 
@@ -84,7 +84,7 @@ export function Deposit() {
             <tr>
               <th>Identificação</th>
               <th>Nome</th>
-              <th>Tipo de depósito</th>
+              <th>Tipo de saque</th>
               <th>Quantia</th>
               <th>Data</th>
             </tr>
@@ -109,7 +109,7 @@ export function Deposit() {
       </section>
 
       <Modal
-        isOpen={depositModalIsOpen}
+        isOpen={withdrawModalIsOpen}
         onRequestClose={closeModal}
         overlayClassName='react-modal-overlay'
         className='react-modal-content'
@@ -119,19 +119,9 @@ export function Deposit() {
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
         >
-          {/* <input
-            type='text'
-            placeholder='Numero do documento de identificação'
-          /> */}
-
           <select>
             <option value='PIX'>PIX</option>
           </select>
-
-          {/* <div>
-            <input type='text' placeholder='Nome' />
-            <input type='text' placeholder='Apelido' />
-          </div> */}
 
           <input
             type='number'
@@ -142,7 +132,7 @@ export function Deposit() {
             placeholder='Quantia (BRL)'
           />
 
-          <button>Depositar</button>
+          <button>Sacar</button>
         </form>
       </Modal>
       <Footer />
