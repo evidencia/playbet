@@ -55,9 +55,13 @@ const requests = {
   put: {
     users: {
       editUser: async (body: IUpdateUser) => {
-        const { data } = await api.put('/users/edit', body);
+        const { data } = await api.put('/users/edit', body.user);
         return data;
       },
+      editProfile: async (body: IUpdateUser) => {
+        const { data } = await api.put('/users/edit-profile', body.profile);
+        return data;
+      }
     },
   },
 };

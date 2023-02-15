@@ -1,8 +1,16 @@
-export interface IUpdateUser {
-  username?: string;
-  email?: string;
-  birthdate?: string;
+export type UserProfile = {
+  name?: string;
+  cpf?: string;
   phoneNumber?: string;
+}
+
+export interface IUpdateUser {
+  user: {
+    username?: string;
+    email?: string;
+    birthdate?: string;
+  };
+  profile: UserProfile;
 }
 
 export default interface IUser {
