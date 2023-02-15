@@ -11,6 +11,7 @@ import formatDate from '../../utils/formatDate';
 import requests from '../../services/requests';
 import formatToBRL from '../../utils/formatToBRL';
 import setUserData from '../../utils/setUserData';
+import { InputEvent } from '../../types/InputEvent';
 
 export function Withdraw() {
   const [withdrawModalIsOpen, setWithdrawModalIsOpen] = useState(false);
@@ -126,7 +127,7 @@ export function Withdraw() {
           <input
             type='number'
             value={amount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onChange={(e: InputEvent) =>
               setAmount(Number(e.target.value))
             }
             placeholder='Quantia (BRL)'

@@ -11,6 +11,7 @@ import formatDate from '../../utils/formatDate';
 import ITransaction from '../../interfaces/ITransaction';
 import formatToBRL from '../../utils/formatToBRL';
 import setUserData from '../../utils/setUserData';
+import { InputEvent } from '../../types/InputEvent';
 
 export function Deposit() {
   const [depositModalIsOpen, setDepositModalIsOpen] = useState(false);
@@ -136,7 +137,7 @@ export function Deposit() {
           <input
             type='number'
             value={amount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onChange={(e: InputEvent) =>
               setAmount(Number(e.target.value))
             }
             placeholder='Quantia (BRL)'

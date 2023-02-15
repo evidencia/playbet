@@ -11,6 +11,7 @@ import IRegister from '../../interfaces/IRegister';
 import { useEffect, useState } from 'react';
 import formatDate from '../../utils/formatDate';
 import requests from '../../services/requests';
+import { InputEvent } from '../../types/InputEvent';
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export function SignUp() {
     return `${day}/${month}/${year}`;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: InputEvent) => {
     setFormData({
       ...formData,
       [e.target.name]:

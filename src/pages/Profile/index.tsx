@@ -2,19 +2,31 @@ import { Footer } from '../../components/Footer';
 import { FooterBottom } from '../../components/FototerBottom';
 import { Header } from '../../components/Header';
 import { Container } from './styles';
+import Modal from 'react-modal';
 import IUser, { IUpdateUser, UserProfile } from '../../interfaces/IUser';
-import { useEffect, useState } from 'react';
+import { ReactEventHandler, useEffect, useState } from 'react';
 import requests from '../../services/requests';
 import formatDate from '../../utils/formatDate';
+import { InputEvent } from '../../types/InputEvent';
 
 export function Profile() {
-  const [isFetching, setFetching] = useState(false);
+  const [userData, setUserData] = useState<IUser>();
+  const [phoneModalIsOpen, setPhoneModalIsOpen] = useState(false);
   const [formData, setFormData] = useState<IUpdateUser>({
     user: {},
     profile: {},
   });
+  const [phoneCode, setPhoneCode] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function openModal() {
+    setPhoneModalIsOpen(true);
+  }
+
+  function closeModal() {
+    setPhoneModalIsOpen(false);
+  }
+
+  const handleChange = (e: InputEvent) => {
     const userProperties = ['username', 'email', 'birthdate'];
     if (userProperties.some((property) => property === e.target.name)) {
       setFormData({
@@ -37,27 +49,25 @@ export function Profile() {
 
   const getUserData = async () => {
     try {
-      setFetching(true);
-      const userData = await requests.get.auth.userInformations();
+      const data = await requests.get.auth.userInformations();
+      setUserData(data);
 
       const toSkipCountryCode = 2;
 
       setFormData({
         user: {
-          birthdate: formatDate(userData.birthdate),
-          email: userData.email,
-          username: userData.username,
+          birthdate: formatDate(data.birthdate),
+          email: data.email,
+          username: data.username,
         },
         profile: {
-          phoneNumber: userData.profile.phoneNumber
-            ? userData.profile.phoneNumber.slice(toSkipCountryCode)
+          phoneNumber: data.profile.phoneNumber
+            ? data.profile.phoneNumber.slice(toSkipCountryCode)
             : '',
-          name: userData.profile.fullName ?? '',
-          cpf: userData.profile.cpf ?? '',
+          name: data.profile.fullName ?? '',
+          cpf: data.profile.cpf ?? '',
         },
       });
-
-      setFetching(false);
     } catch (error) {
       console.error(error);
     }
@@ -109,6 +119,26 @@ export function Profile() {
     return value;
   };
 
+  const sendPhoneSMS = async () => {
+    if (!userData) return;
+    const phoneNumber = userData.profile.phoneNumber;
+    if (phoneNumber) await requests.post.auth.sendSMS(phoneNumber);
+  };
+
+  const validatePhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (!userData) throw new Error('User not found');
+      await requests.post.auth.phoneAuthentication({
+        phoneNumber: userData.profile.phoneNumber as string,
+        code: phoneCode,
+      });
+      closeModal();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     getUserData();
   }, []);
@@ -116,66 +146,102 @@ export function Profile() {
   return (
     <Container>
       <Header />
-      {!isFetching && (
-        <section>
-          <form onSubmit={handleSubmit}>
-            <p>Informações pessoais</p>
 
-            <div>
-              <input
-                name='username'
-                type='text'
-                placeholder='Nome de usuário'
-                value={formData.user.username}
-                onChange={handleChange}
-              />
-              <input
-                name='email'
-                type='email'
-                placeholder='E-mail'
-                value={formData.user.email}
-                onChange={handleChange}
-              />
-            </div>
+      <Modal
+        isOpen={phoneModalIsOpen}
+        onRequestClose={closeModal}
+        overlayClassName='react-modal-overlay'
+        className='react-modal-content'
+      >
+        <form className='depositModal' onSubmit={validatePhone}>
+          <input
+            id='phone-code'
+            type='text'
+            placeholder='Código SMS'
+            maxLength={6}
+            value={phoneCode}
+            onChange={(e: InputEvent) => setPhoneCode(e.target.value)}
+          />
+          <button type='submit'>Enviar</button>
+        </form>
+      </Modal>
 
-            <div>
-              <input
-                name='name'
-                type='text'
-                value={formData.profile.name}
-                placeholder='Nome'
-                onChange={handleChange}
-              />
-              <input
-                name='cpf'
-                type='text'
-                value={formData.profile.cpf}
-                placeholder='CPF'
-                onChange={handleChange}
-              />
-            </div>
+      <section>
+        <form onSubmit={handleSubmit}>
+          <p>Informações pessoais</p>
 
-            <div>
-              <input
-                name='birthdate'
-                type='text'
-                value={formData.user.birthdate}
-                onChange={handleChange}
-              />
-              <input
-                name='phoneNumber'
-                type='text'
-                maxLength={15}
-                value={phoneMask(formData.profile.phoneNumber)}
-                onChange={handleChange}
-                placeholder={'(xx) xxxxx-xxxx'}
-              />
-            </div>
+          <div>
+            <input
+              name='username'
+              type='text'
+              placeholder='Nome de usuário'
+              value={formData.user.username}
+              onChange={handleChange}
+            />
+            <input
+              name='email'
+              type='email'
+              placeholder='E-mail'
+              value={formData.user.email}
+              onChange={handleChange}
+            />
+          </div>
 
-            <button>Salvar</button>
-          </form>
-        </section>
-      )}
+          <div>
+            <input
+              name='name'
+              type='text'
+              value={formData.profile.name}
+              placeholder='Nome'
+              onChange={handleChange}
+            />
+            <input
+              name='cpf'
+              type='text'
+              value={formData.profile.cpf}
+              placeholder='CPF'
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <input
+              name='birthdate'
+              type='text'
+              placeholder='Data de nascimento'
+              value={formData.user.birthdate}
+              onChange={handleChange}
+            />
+            <input
+              name='phoneNumber'
+              type='text'
+              maxLength={15}
+              value={phoneMask(formData.profile.phoneNumber)}
+              onChange={handleChange}
+              style={{ width: '100%' }}
+              placeholder={'(xx) xxxxx-xxxx'}
+            />
+          </div>
+
+          <div>
+            <button style={{ fontSize: '18px' }}>Salvar</button>
+            <button
+              disabled={
+                !!!userData?.profile.phoneNumber ||
+                userData?.profile.validPhoneNumber
+              }
+              onClick={async () => {
+                await sendPhoneSMS();
+                openModal();
+              }}
+              style={{ fontSize: '18px' }}
+            >
+              Validar telefone
+            </button>
+          </div>
+        </form>
+      </section>
+
       <Footer />
       <FooterBottom />
     </Container>

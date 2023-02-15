@@ -18,7 +18,7 @@ export default interface ITransaction {
   transactionType: TransactionType;
   paymentMethod: string;
   amount: number;
-  createdAt: Date;
+  createdAt: string;
   user: {
     id: string;
     username: string;

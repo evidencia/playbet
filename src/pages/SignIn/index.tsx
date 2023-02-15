@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import requests, { setTokenHeaders } from '../../services/requests';
 import { useState } from 'react';
 import setUserData from '../../utils/setUserData';
+import { InputEvent } from '../../types/InputEvent';
 
 export function SignIn() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export function SignIn() {
     password: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: InputEvent) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,

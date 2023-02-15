@@ -17,7 +17,7 @@ export default interface IUser {
   id: string;
   username: string;
   email: string;
-  birthdate: Date;
+  birthdate: string;
   account: {
     id: string;
     balance: number;
