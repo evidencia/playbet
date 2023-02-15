@@ -2,8 +2,11 @@ import { Container } from './styles';
 import penaltiGame from '../../assets/gol.jpg'
 import avelhaGame from '../../assets/tic-tac.jpg'
 import { ArrowLeft, ArrowRight } from 'phosphor-react';
+import { useNavigate } from 'react-router-dom';
 
 export function Games(){
+  const navigate = useNavigate();
+
   return (
     <Container>
       <header>
@@ -33,7 +36,7 @@ export function Games(){
         <div>
           <img src={avelhaGame} alt="" />
 
-          <button>
+          <button onClick={() => navigate('/game/tic-tac-toe')}>
             Play Now
             <ArrowRight size={18} weight="bold" />
           </button>
