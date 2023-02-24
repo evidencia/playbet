@@ -10,6 +10,8 @@ import { ForgotPassword } from "./pages/ForgotPassword";
 import { Bets } from "./pages/Bets";
 import { Deposit } from "./pages/Deposit";
 import { Profile } from "./pages/Profile";
+import { Withdraw } from "./pages/Withdraw";
+import { TicTacToe } from "./pages/TicTacToe";
 
 Modal.setAppElement('#root');
 
@@ -29,6 +31,8 @@ export function App() {
           <Route path="/bets" element={<Bets />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/deposit" element={<Deposit />} />
+          <Route path="/saques" element={<Withdraw />} />
+          <Route path="/game/tic-tac-toe" element={<TicTacToe />} />
         </Routes>
       </BrowserRouter>
     </>

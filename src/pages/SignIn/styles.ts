@@ -103,10 +103,8 @@ export const Content = styled.div`
     }
 
     .btn {
-      position: relative;
-
       button {
-        position: absolute;
+        width: 100%;
         top: 20px;
         left: 0;
         right: 0;
